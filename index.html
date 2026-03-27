@@ -146,15 +146,25 @@
     align-items: center;
     justify-content: space-between;
     opacity: 0;
-    transition: background 0.4s, backdrop-filter 0.4s;
+    transition: background 0.4s, backdrop-filter 0.4s, border-color 0.4s;
   }
   nav.visible { opacity: 1; }
   nav.scrolled {
-    background: rgba(247,246,243,0.9);
+    background: rgba(247,246,243,0.92);
     backdrop-filter: blur(16px);
     border-bottom: 1px solid rgba(0,0,0,0.06);
   }
-  .nav-logo img { height: 36px; }
+
+  /* Logo — белый на hero, тёмный после скролла */
+  .nav-logo img {
+    height: 36px;
+    filter: brightness(0) invert(1);
+    transition: filter 0.4s;
+  }
+  nav.scrolled .nav-logo img {
+    filter: none;
+  }
+
   .nav-links {
     display: flex;
     gap: 40px;
@@ -166,10 +176,13 @@
     font-weight: 600;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: var(--navy);
+    color: rgba(255,255,255,0.9);
     text-decoration: none;
     position: relative;
-    transition: color 0.3s;
+    transition: color 0.4s;
+  }
+  nav.scrolled .nav-links a {
+    color: var(--navy);
   }
   .nav-links a::after {
     content: '';
@@ -181,6 +194,8 @@
   }
   .nav-links a:hover { color: var(--orange); }
   .nav-links a:hover::after { width: 100%; }
+  nav.scrolled .nav-links a:hover { color: var(--orange); }
+
   .nav-cta {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 12px;
@@ -192,7 +207,9 @@
     border: none;
     padding: 10px 24px;
     cursor: none;
+    text-decoration: none;
     transition: background 0.3s, transform 0.2s;
+    display: inline-block;
   }
   .nav-cta:hover { background: var(--orange-light); transform: translateY(-1px); }
 
@@ -1489,7 +1506,7 @@
 <!-- Hero -->
 <section id="hero">
   <div class="hero-bg">
-    <img src="assets/6.png.jpg" alt="Track Day">
+    <img src="assets/1.png" alt="Track Day">
   </div>
   <div class="hero-overlay"></div>
   <div class="hero-stripe"></div>
@@ -1826,7 +1843,7 @@
         </div>
         <div class="org-separator"></div>
         <div class="org-logo">
-          <img src="assets/Cc.jpg" alt="Classic Cars Warsaw" style="border-radius:4px;">
+          <img src="assets/icon.jpg" alt="Classic Cars Warsaw" style="border-radius:4px;">
           <span>Classic Cars Warsaw</span>
         </div>
       </div>
@@ -1893,7 +1910,7 @@
   <div class="footer-logo">
     <img src="assets/logo.png" alt="Thoriana Racing">
   </div>
-  <div class="footer-copy">© 2026 Thoriana Racing. Wszelkie prawa zastrzeżone.</div>
+  <div class="footer-copy">© 2025 Thoriana Racing. Wszelkie prawa zastrzeżone.</div>
   <ul class="footer-links">
     <li><a href="#about">O Wydarzeniu</a></li>
     <li><a href="#formula">Formuła</a></li>
