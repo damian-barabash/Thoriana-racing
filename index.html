@@ -1,0 +1,2012 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thoriana Racing TrackDay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;0,900;1,400;1,700&family=Barlow:wght@300;400;500;600&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1a2340;
+    --navy-mid: #243050;
+    --orange: #e8460a;
+    --orange-light: #ff6030;
+    --white: #ffffff;
+    --off-white: #f7f6f3;
+    --light-gray: #ebebeb;
+    --text-dark: #111827;
+    --text-mid: #374151;
+    --text-light: #6b7280;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; overflow-x: hidden; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--off-white);
+    color: var(--text-dark);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ─── CURSOR ─── */
+  .cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--orange);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+    mix-blend-mode: multiply;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 40px; height: 40px;
+    border: 1.5px solid var(--orange);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.15s ease;
+    opacity: 0.6;
+  }
+
+  /* ─── PRELOADER ─── */
+  #preloader {
+    position: fixed;
+    inset: 0;
+    background: var(--navy);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+  }
+
+  .preloader-logo {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .preloader-logo img {
+    height: 64px;
+    filter: brightness(0) invert(1);
+  }
+
+  .preloader-line-wrap {
+    width: 240px;
+    height: 2px;
+    background: rgba(255,255,255,0.12);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    animation: fadeIn 0.4s 0.6s forwards;
+  }
+  .preloader-line {
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, var(--orange), transparent);
+    animation: scan 1.6s 0.8s ease-in-out forwards;
+  }
+  .preloader-bar {
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%;
+    width: 0%;
+    background: var(--orange);
+    animation: loadBar 1.4s 0.8s cubic-bezier(0.4,0,0.2,1) forwards;
+  }
+  .preloader-counter {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.4);
+    opacity: 0;
+    animation: fadeIn 0.4s 0.6s forwards;
+  }
+
+  @keyframes scan {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+  @keyframes loadBar {
+    0% { width: 0%; }
+    100% { width: 100%; }
+  }
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+  @keyframes slideOut {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-100%); }
+  }
+  #preloader.done {
+    animation: slideOut 0.9s 0.3s cubic-bezier(0.76,0,0.24,1) forwards;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    padding: 20px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    opacity: 0;
+    transition: background 0.4s, backdrop-filter 0.4s;
+  }
+  nav.visible { opacity: 1; }
+  nav.scrolled {
+    background: rgba(247,246,243,0.9);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .nav-logo img { height: 36px; }
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--navy);
+    text-decoration: none;
+    position: relative;
+    transition: color 0.3s;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -3px; left: 0;
+    width: 0; height: 1.5px;
+    background: var(--orange);
+    transition: width 0.3s;
+  }
+  .nav-links a:hover { color: var(--orange); }
+  .nav-links a:hover::after { width: 100%; }
+  .nav-cta {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--white);
+    background: var(--orange);
+    border: none;
+    padding: 10px 24px;
+    cursor: none;
+    transition: background 0.3s, transform 0.2s;
+  }
+  .nav-cta:hover { background: var(--orange-light); transform: translateY(-1px); }
+
+  /* ─── HERO ─── */
+  #hero {
+    position: relative;
+    height: 100vh;
+    min-height: 700px;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 100px;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .hero-bg img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transform: scale(1.08);
+    animation: heroZoom 12s ease-out forwards;
+    filter: brightness(0.55) saturate(0.7);
+  }
+  @keyframes heroZoom {
+    0% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(26,35,64,0.2) 0%,
+      rgba(26,35,64,0.1) 40%,
+      rgba(247,246,243,0.95) 100%
+    );
+    z-index: 1;
+  }
+
+  .hero-stripe {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--orange) 30%, var(--orange) 70%, transparent);
+    z-index: 3;
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: stripeIn 1.2s 2.2s cubic-bezier(0.4,0,0.2,1) forwards;
+  }
+  @keyframes stripeIn {
+    to { transform: scaleX(1); }
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 0 60px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .hero-tag {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 20px;
+    opacity: 0;
+    transform: translateY(20px);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hero-tag::before {
+    content: '';
+    display: inline-block;
+    width: 30px;
+    height: 1.5px;
+    background: var(--orange);
+  }
+
+  .hero-h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(72px, 10vw, 140px);
+    font-weight: 900;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: var(--white);
+    letter-spacing: -0.01em;
+    opacity: 0;
+    transform: translateY(40px);
+    text-shadow: 0 4px 40px rgba(0,0,0,0.3);
+  }
+
+  .hero-h1 em {
+    font-style: italic;
+    color: var(--orange);
+  }
+
+  .hero-sub {
+    font-family: 'Barlow', sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    color: var(--white);
+    margin-top: 24px;
+    letter-spacing: 0.05em;
+    opacity: 0;
+    transform: translateY(20px);
+    max-width: 480px;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.4);
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin-top: 44px;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .btn-primary {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--white);
+    background: var(--orange);
+    border: none;
+    padding: 16px 40px;
+    cursor: none;
+    text-decoration: none;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--white);
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.76,0,0.24,1);
+  }
+  .btn-primary:hover { transform: translateY(-2px); }
+  .btn-primary:hover::before { transform: translateX(0); }
+  .btn-primary span { position: relative; z-index: 1; }
+  .btn-primary:hover span { color: var(--orange); }
+
+  .btn-ghost {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: color 0.3s;
+  }
+  .btn-ghost svg { transition: transform 0.3s; }
+  .btn-ghost:hover { color: var(--orange); }
+  .btn-ghost:hover svg { transform: translateX(6px); }
+
+  /* Scroll indicator */
+  .scroll-ind {
+    position: absolute;
+    bottom: 40px;
+    right: 60px;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: fadeIn 0.6s 3s forwards;
+  }
+  .scroll-ind span {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    writing-mode: vertical-rl;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 60px;
+    background: rgba(255,255,255,0.2);
+    position: relative;
+    overflow: hidden;
+  }
+  .scroll-line::after {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: var(--orange);
+    animation: scrollDown 2s 3s infinite;
+  }
+  @keyframes scrollDown {
+    0% { top: -50%; }
+    100% { top: 150%; }
+  }
+
+  /* ─── SECTION BASE ─── */
+  section { position: relative; }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 60px;
+  }
+
+  .section-tag {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--orange);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .section-tag::before {
+    content: '';
+    display: inline-block;
+    width: 30px;
+    height: 1.5px;
+    background: var(--orange);
+  }
+
+  .section-h2 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(44px, 5vw, 72px);
+    font-weight: 900;
+    text-transform: uppercase;
+    line-height: 0.95;
+    color: var(--navy);
+    letter-spacing: -0.01em;
+  }
+  .section-h2 em {
+    font-style: italic;
+    color: var(--orange);
+  }
+
+  /* ─── REVEAL ANIMATIONS ─── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s cubic-bezier(0.4,0,0.2,1), transform 0.8s cubic-bezier(0.4,0,0.2,1);
+  }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: opacity 0.9s cubic-bezier(0.4,0,0.2,1), transform 0.9s cubic-bezier(0.4,0,0.2,1);
+  }
+  .reveal-left.in { opacity: 1; transform: translateX(0); }
+  .reveal-right {
+    opacity: 0;
+    transform: translateX(50px);
+    transition: opacity 0.9s cubic-bezier(0.4,0,0.2,1), transform 0.9s cubic-bezier(0.4,0,0.2,1);
+  }
+  .reveal-right.in { opacity: 1; transform: translateX(0); }
+
+  /* stagger delays */
+  .d1 { transition-delay: 0.1s; }
+  .d2 { transition-delay: 0.2s; }
+  .d3 { transition-delay: 0.3s; }
+  .d4 { transition-delay: 0.4s; }
+  .d5 { transition-delay: 0.5s; }
+  .d6 { transition-delay: 0.6s; }
+
+  /* ─── ABOUT ─── */
+  #about {
+    padding: 140px 0;
+    background: var(--off-white);
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    margin-top: 64px;
+  }
+
+  .about-text p {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.8;
+    color: var(--text-mid);
+    margin-bottom: 24px;
+  }
+  .about-text p strong {
+    color: var(--navy);
+    font-weight: 600;
+  }
+
+  .about-img-wrap {
+    position: relative;
+  }
+  .about-img-wrap img {
+    width: 100%;
+    height: 480px;
+    object-fit: cover;
+    display: block;
+  }
+  .about-img-accent {
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+    width: 120px;
+    height: 120px;
+    border: 3px solid var(--orange);
+    z-index: -1;
+  }
+  .about-img-tag {
+    position: absolute;
+    top: 24px;
+    right: -24px;
+    background: var(--orange);
+    color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    writing-mode: vertical-rl;
+  }
+
+  .about-numbers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    margin-top: 48px;
+    border-top: 1px solid var(--light-gray);
+    padding-top: 40px;
+  }
+  .about-num {
+    padding: 20px 0;
+  }
+  .about-num .big {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 52px;
+    font-weight: 900;
+    color: var(--navy);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .about-num .big span { color: var(--orange); }
+  .about-num .label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-top: 6px;
+  }
+
+  /* ─── FOR WHOM ─── */
+  #for-whom {
+    padding: 140px 0;
+    background: var(--navy);
+    overflow: hidden;
+  }
+
+  .for-whom-inner {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .for-whom-left .section-tag { color: var(--orange); }
+  .for-whom-left .section-h2 { color: var(--white); }
+  .for-whom-left p {
+    color: rgba(255,255,255,0.6);
+    font-size: 15px;
+    line-height: 1.8;
+    margin-top: 24px;
+  }
+
+  .whom-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+  }
+
+  .whom-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    padding: 40px 36px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.4s, border-color 0.4s;
+  }
+  .whom-card::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0; height: 2px;
+    background: var(--orange);
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+  .whom-card:hover { background: rgba(255,255,255,0.07); }
+  .whom-card:hover::before { width: 100%; }
+
+  .whom-card-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 64px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.06);
+    line-height: 1;
+    margin-bottom: 16px;
+    letter-spacing: -0.03em;
+  }
+  .whom-card h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+  .whom-card p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* ─── FORMULA ─── */
+  #formula {
+    padding: 140px 0;
+    background: var(--off-white);
+  }
+
+  .formula-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 80px;
+  }
+
+  .formula-timeline {
+    position: relative;
+    padding-left: 60px;
+  }
+  .formula-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 1px;
+    background: var(--light-gray);
+  }
+
+  .timeline-item {
+    position: relative;
+    padding: 0 0 60px 40px;
+    border-left: none;
+  }
+  .timeline-item:last-child { padding-bottom: 0; }
+
+  .timeline-dot {
+    position: absolute;
+    left: -30px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--orange);
+    background: var(--off-white);
+    border-radius: 50%;
+    transition: background 0.3s;
+  }
+  .timeline-item:hover .timeline-dot { background: var(--orange); }
+
+  .timeline-step {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 8px;
+  }
+  .timeline-item h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 10px;
+    letter-spacing: 0.02em;
+  }
+  .timeline-item p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-mid);
+    max-width: 500px;
+  }
+
+  .formula-img-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 240px 240px;
+    gap: 8px;
+    margin-top: 100px;
+  }
+  .formula-img-grid img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: brightness(0.9) saturate(0.85);
+    transition: filter 0.5s, transform 0.5s;
+  }
+  .formula-img-grid .big-img {
+    grid-row: span 2;
+  }
+  .formula-img-grid img:hover {
+    filter: brightness(1) saturate(1);
+    transform: scale(1.02);
+  }
+  .formula-img-grid div { overflow: hidden; }
+
+  /* ─── CARS ─── */
+  #cars {
+    padding: 140px 0;
+    background: var(--white);
+    overflow: hidden;
+  }
+
+  .cars-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .cars-img {
+    position: relative;
+  }
+  .cars-img img {
+    width: 100%; height: 500px;
+    object-fit: cover;
+    display: block;
+    filter: brightness(0.85) saturate(0.8);
+  }
+  .cars-badge {
+    position: absolute;
+    bottom: 32px;
+    right: 32px;
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cars-badge::before {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 6px;
+    background: var(--orange);
+    border-radius: 50%;
+  }
+
+  .cars-content p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--text-mid);
+    margin-bottom: 20px;
+  }
+
+  .cars-highlight {
+    border-left: 3px solid var(--orange);
+    padding-left: 24px;
+    margin: 40px 0;
+  }
+  .cars-highlight p {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--navy);
+    text-transform: uppercase;
+    line-height: 1.3;
+    letter-spacing: 0.02em;
+  }
+
+  /* ─── FORMAT ─── */
+  #format {
+    padding: 140px 0;
+    background: var(--off-white);
+  }
+
+  .format-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 80px;
+  }
+
+  .format-card {
+    background: var(--white);
+    padding: 48px 40px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .format-card:hover { transform: translateY(-8px); }
+  .format-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--orange);
+    transform: scaleX(0);
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .format-card:hover::after { transform: scaleX(1); }
+
+  .format-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 28px;
+  }
+  .format-icon svg { width: 100%; height: 100%; }
+
+  .format-card h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--navy);
+    letter-spacing: 0.04em;
+    margin-bottom: 14px;
+  }
+  .format-card p {
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--text-light);
+  }
+
+  /* ─── PRICE ─── */
+  #price {
+    padding: 140px 0;
+    background: var(--navy);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .price-bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 300px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.02);
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .price-inner {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+  .price-inner .section-tag {
+    justify-content: center;
+  }
+  .price-inner .section-tag::before { display: none; }
+  .price-inner .section-h2 { color: var(--white); text-align: center; }
+
+  .price-card {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 64px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 64px 100px;
+    position: relative;
+    min-width: 640px;
+  }
+  .price-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--orange) 30%, var(--orange) 70%, transparent);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 1s 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .price-card.in::before { transform: scaleX(1); }
+
+  .price-from {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .price-from::before, .price-from::after {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 1.5px;
+    background: var(--orange);
+    opacity: 0.5;
+  }
+
+  .price-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(90px, 14vw, 160px);
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0;
+  }
+  .price-num .price-big {
+    font-size: inherit;
+    color: var(--white);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    font-style: italic;
+  }
+  .price-currency {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(20px, 3vw, 36px);
+    font-weight: 400;
+    color: rgba(255,255,255,0.35);
+    margin-left: 12px;
+    align-self: flex-end;
+    padding-bottom: 8px;
+    letter-spacing: 0.1em;
+  }
+
+  /* count-up animation */
+  .price-num .price-big {
+    transition: color 0.3s;
+  }
+  #price:hover .price-num .price-big {
+    color: rgba(255,255,255,0.85);
+  }
+
+  .price-includes {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 40px;
+    text-align: left;
+  }
+  .price-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.65);
+  }
+  .price-item::before {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 5px;
+    background: var(--orange);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 7px;
+  }
+
+  .price-note {
+    margin-top: 40px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.3);
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  /* ─── ATMOSPHERE ─── */
+  #atmosphere {
+    padding: 140px 0;
+    background: var(--off-white);
+  }
+
+  .atmosphere-masonry {
+    columns: 3;
+    column-gap: 8px;
+    margin-top: 64px;
+  }
+  .atm-img {
+    break-inside: avoid;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .atm-img img {
+    width: 100%;
+    display: block;
+    filter: brightness(0.88) saturate(0.7);
+    transition: filter 0.5s, transform 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+  .atm-img:hover img {
+    filter: brightness(1) saturate(1);
+    transform: scale(1.04);
+  }
+
+  /* ─── ORGANIZERS ─── */
+  #organizers {
+    padding: 100px 0;
+    background: var(--white);
+    border-top: 1px solid var(--light-gray);
+  }
+
+  .org-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 60px;
+  }
+  .org-text .section-tag { margin-bottom: 16px; }
+  .org-text p {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text-mid);
+    max-width: 440px;
+  }
+  .org-logos {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+  }
+  .org-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .org-logo img { height: 56px; filter: grayscale(1); transition: filter 0.3s; }
+  .org-logo:hover img { filter: grayscale(0); }
+  .org-logo span {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+  .org-separator {
+    width: 1px;
+    height: 48px;
+    background: var(--light-gray);
+  }
+
+  /* ─── CONTACT / CTA ─── */
+  #contact {
+    padding: 160px 0;
+    background: var(--off-white);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .contact-bg-line {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    width: 1px;
+    background: var(--light-gray);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 1s 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .contact-bg-line.in { transform: scaleY(1); }
+
+  .contact-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .contact-inner .section-tag { justify-content: center; }
+  .contact-inner .section-tag::before { display: none; }
+  .contact-inner .section-h2 { text-align: center; }
+  .contact-inner .section-h2 em { display: block; }
+
+  .contact-desc {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--text-mid);
+    margin-top: 28px;
+  }
+
+  .contact-form {
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    text-align: left;
+  }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .form-group label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--navy);
+  }
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    background: var(--white);
+    border: 1px solid var(--light-gray);
+    padding: 14px 16px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 15px;
+    color: var(--text-dark);
+    outline: none;
+    transition: border-color 0.3s;
+    cursor: none;
+    appearance: none;
+    width: 100%;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    border-color: var(--orange);
+  }
+  .form-group textarea { height: 120px; resize: vertical; }
+
+  .form-submit {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--white);
+    background: var(--navy);
+    border: none;
+    padding: 18px 48px;
+    cursor: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+    align-self: center;
+    transition: background 0.3s, transform 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .form-submit::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--orange);
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.76,0,0.24,1);
+  }
+  .form-submit:hover { transform: translateY(-2px); }
+  .form-submit:hover::before { transform: translateX(0); }
+  .form-submit span { position: relative; z-index: 1; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--navy);
+    padding: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-logo img { height: 32px; filter: brightness(0) invert(1); opacity: 0.8; }
+  .footer-copy {
+    font-size: 12px;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.08em;
+  }
+  .footer-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+  .footer-links a {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .footer-links a:hover { color: var(--orange); }
+
+  /* ─── MARQUEE ─── */
+  .marquee-wrap {
+    overflow: hidden;
+    background: var(--orange);
+    padding: 14px 0;
+  }
+  .marquee-track {
+    display: flex;
+    gap: 0;
+    animation: marquee 18s linear infinite;
+    white-space: nowrap;
+  }
+  .marquee-item {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--white);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .marquee-item::after {
+    content: '·';
+    color: rgba(255,255,255,0.5);
+  }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ─── TILT cards */
+  .whom-card {
+    transition: background 0.4s, border-color 0.4s, transform 0.3s;
+    transform-style: preserve-3d;
+  }
+
+  /* ─── price card top stripe reveal */
+  .price-card.reveal { opacity: 0; transform: translateY(40px); }
+  .price-card.reveal.in { opacity: 1; transform: translateY(0); }
+
+  /* ─── count-up number style */
+  #priceCounter {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(90px, 14vw, 160px);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    font-style: italic;
+    color: var(--white);
+    line-height: 1;
+    display: inline-block;
+  }
+
+  /* ─── HERO H1 glitch keyframe */
+  @keyframes glitch {
+    0%,100% { text-shadow: none; }
+    20% { text-shadow: 3px 0 #e8460a, -3px 0 rgba(26,35,64,0.5); }
+    40% { text-shadow: -2px 0 #e8460a; }
+    60% { text-shadow: 2px 0 rgba(232,70,10,0.4); }
+  }
+
+  /* ─── TIMELINE stagger */
+  .timeline-item {
+    transition: opacity 0.7s, transform 0.7s;
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  .timeline-item.tl-in {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* ─── PRICE section canvas */
+  #price { isolation: isolate; }
+
+  @media (max-width: 900px) {
+    nav { padding: 20px 24px; }
+    .container { padding: 0 24px; }
+    .about-grid, .for-whom-inner, .cars-inner { grid-template-columns: 1fr; gap: 48px; }
+    .format-grid { grid-template-columns: 1fr; }
+    .formula-img-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+    .formula-img-grid .big-img { grid-row: span 1; }
+    .form-row { grid-template-columns: 1fr; }
+    .org-inner { flex-direction: column; }
+    footer { flex-direction: column; gap: 24px; text-align: center; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Preloader -->
+<div id="preloader">
+  <div class="preloader-logo">
+    <img src="assets/logo.png" alt="Thoriana Racing">
+  </div>
+  <div class="preloader-line-wrap">
+    <div class="preloader-line"></div>
+    <div class="preloader-bar"></div>
+  </div>
+  <div class="preloader-counter" id="counter">0%</div>
+</div>
+
+<!-- Navigation -->
+<nav id="nav">
+  <div class="nav-logo">
+    <img src="assets/logo.png" alt="Thoriana Racing">
+  </div>
+  <ul class="nav-links">
+    <li><a href="#about">O Wydarzeniu</a></li>
+    <li><a href="#formula">Formuła</a></li>
+    <li><a href="#price">Cena</a></li>
+    <li><a href="#contact">Zgłoszenia</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Dołącz</a>
+</nav>
+
+<!-- Hero -->
+<section id="hero">
+  <div class="hero-bg">
+    <img src="assets/1.png" alt="Track Day">
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="hero-stripe"></div>
+
+  <div class="hero-content">
+    <div class="hero-tag" id="heroTag">Pierwsza Edycja · Limited Access</div>
+    <h1 class="hero-h1" id="heroH1">
+      Thoriana<br>
+      <em>Racing</em><br>
+      TrackDay
+    </h1>
+    <p class="hero-sub" id="heroSub">Driving with friends — kameralny track day dla kierowców, którzy chcą jeździć sprawniej, pewniej i w dobrym towarzystwie.</p>
+    <div class="hero-actions" id="heroActions">
+      <a href="#contact" class="btn-primary"><span>Zgłoś się</span></a>
+      <a href="#about" class="btn-ghost">
+        O wydarzeniu
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="scroll-ind">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- Marquee -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item">Torowa Technika</div>
+    <div class="marquee-item">Instruktor na Torze</div>
+    <div class="marquee-item">Limited Access</div>
+    <div class="marquee-item">Kameralny Format</div>
+    <div class="marquee-item">Własny Samochód</div>
+    <div class="marquee-item">Pierwsze Uruchomienie</div>
+    <div class="marquee-item">Torowa Technika</div>
+    <div class="marquee-item">Instruktor na Torze</div>
+    <div class="marquee-item">Limited Access</div>
+    <div class="marquee-item">Kameralny Format</div>
+    <div class="marquee-item">Własny Samochód</div>
+    <div class="marquee-item">Pierwsze Uruchomienie</div>
+  </div>
+</div>
+
+<!-- About -->
+<section id="about">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-tag">O Wydarzeniu</div>
+      <h2 class="section-h2">Nie masowy<br><em>Track Day</em></h2>
+    </div>
+    <div class="about-grid">
+      <div class="about-text reveal d2">
+        <p><strong>Thoriana Racing TrackDay</strong> to zamknięty event torowy skierowany do średniozaawansowanych i zaawansowanych kierowców, którzy chcą rozwijać swoje umiejętności w spokojnej, dobrze zorganizowanej formule.</p>
+        <p>To nie jest masowy track day. To spotkanie dla osób, które chcą pojeździć w dobrym tempie, skorzystać z merytorycznego wsparcia i spędzić dzień na torze w gronie ludzi, którzy naprawdę cenią jazdę i motoryzację.</p>
+        <p>Pierwsza edycja wydarzenia powstaje jako zamknięte spotkanie w ograniczonym gronie — z naciskiem na <strong>praktykę, merytorykę i czystą przyjemność z jazdy po torze.</strong></p>
+
+        <div class="about-numbers">
+          <div class="about-num">
+            <div class="big"><span>100</span>%</div>
+            <div class="label">Własne Auta Uczestników</div>
+          </div>
+          <div class="about-num">
+            <div class="big">Małe<span>.</span></div>
+            <div class="label">Grupy Torowe</div>
+          </div>
+          <div class="about-num">
+            <div class="big">1<span>:</span>1</div>
+            <div class="label">Wsparcie Instruktora</div>
+          </div>
+          <div class="about-num">
+            <div class="big"><span>∞</span></div>
+            <div class="label">Pasja do Motoryzacji</div>
+          </div>
+        </div>
+      </div>
+      <div class="about-img-wrap reveal-right d3">
+        <img src="assets/2.png" alt="Track Day">
+        <div class="about-img-accent"></div>
+        <div class="about-img-tag">TrackDay 2025</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- For Whom -->
+<section id="for-whom">
+  <div class="container">
+    <div class="for-whom-inner">
+      <div class="for-whom-left reveal">
+        <div class="section-tag">Dla Kogo</div>
+        <h2 class="section-h2">Jazda<br>dla tych,<br>którzy<br><em>chcą więcej</em></h2>
+        <p>Format dla osób, które już jeżdżą i chcą robić to lepiej. Świadoma technika, dobre towarzystwo, realne tempo.</p>
+      </div>
+      <div class="whom-cards reveal-right d2">
+        <div class="whom-card">
+          <div class="whom-card-num">01</div>
+          <h3>Średniozaawansowani</h3>
+          <p>Masz już doświadczenie torowe i chcesz przejść na kolejny poziom techniki jazdy.</p>
+        </div>
+        <div class="whom-card">
+          <div class="whom-card-num">02</div>
+          <h3>Zaawansowani</h3>
+          <p>Szukasz wydarzenia z poważnym podejściem do jazdy i bez kompromisów w organizacji.</p>
+        </div>
+        <div class="whom-card">
+          <div class="whom-card-num">03</div>
+          <h3>Świadomi Kierowcy</h3>
+          <p>Zależy Ci na tym, żeby rozwijać technikę z merytorycznym wsparciem, nie tylko jeździć.</p>
+        </div>
+        <div class="whom-card">
+          <div class="whom-card-num">04</div>
+          <h3>Miłośnicy Motoryzacji</h3>
+          <p>Cenisz kameralną atmosferę i spędzanie czasu z ludźmi, którzy naprawdę pasjonują się motoryzacją.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Formula -->
+<section id="formula">
+  <div class="container">
+    <div class="formula-header">
+      <div class="reveal">
+        <div class="section-tag">Formuła Dnia</div>
+        <h2 class="section-h2">Plan<br><em>Wydarzenia</em></h2>
+      </div>
+      <p class="reveal d2" style="max-width:320px; color:var(--text-light); font-size:15px; line-height:1.8;">Plan wydarzenia zakłada połączenie części merytorycznej z jazdą na torze.</p>
+    </div>
+
+    <div class="formula-timeline">
+      <div class="timeline-item reveal">
+        <div class="timeline-dot"></div>
+        <div class="timeline-step">Etap 01</div>
+        <h3>Briefing & Szkolenie</h3>
+        <p>Część merytoryczna otwierająca dzień — omówienie toru, technik jazdy, planu dnia i zasad bezpieczeństwa.</p>
+      </div>
+      <div class="timeline-item reveal d1">
+        <div class="timeline-dot"></div>
+        <div class="timeline-step">Etap 02</div>
+        <h3>Wsparcie Instruktorskie</h3>
+        <p>Instruktor na bieżąco wspiera uczestników, również przez radio. Indywidualne podejście do każdego kierowcy.</p>
+      </div>
+      <div class="timeline-item reveal d2">
+        <div class="timeline-dot"></div>
+        <div class="timeline-step">Etap 03</div>
+        <h3>Jazda w Małych Grupach</h3>
+        <p>Jazda w kameralnych grupach — tak, żeby każdy miał realną przestrzeń, skupienie i tempore.</p>
+      </div>
+      <div class="timeline-item reveal d3">
+        <div class="timeline-dot"></div>
+        <div class="timeline-step">Etap 04</div>
+        <h3>Otwarta Sesja Torowa</h3>
+        <p>Część otwarta po zakończeniu szkolenia — czysta przyjemność z jazdy po torze.</p>
+      </div>
+    </div>
+
+    <div class="formula-img-grid reveal d2">
+      <div class="big-img"><img src="assets/3.png" alt="Track"></div>
+      <div><img src="assets/4.png" alt="Track"></div>
+      <div><img src="assets/5.png" alt="Track"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Cars -->
+<section id="cars">
+  <div class="container">
+    <div class="cars-inner">
+      <div class="cars-img reveal-left">
+        <img src="assets/1.png" alt="Samochody">
+        <div class="cars-badge">Własny Samochód</div>
+      </div>
+      <div class="cars-content reveal-right d2">
+        <div class="section-tag">Samochody</div>
+        <h2 class="section-h2">Twoje<br>auto,<br><em>twój tor</em></h2>
+
+        <div class="cars-highlight">
+          <p>Formuła stworzona z myślą o osobach, które chcą lepiej poznać możliwości swojego auta.</p>
+        </div>
+
+        <p>Uczestnicy biorą udział w wydarzeniu przede wszystkim własnymi samochodami. To najlepszy sposób, żeby pewniej wykorzystywać auto w warunkach torowych i naprawdę zrozumieć jego granice.</p>
+        <p>Jazda własnym samochodem na torze to doświadczenie, które przekłada się bezpośrednio na codzienną jazdę i świadomość kierowcy.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Format kameralny -->
+<section id="format">
+  <div class="container">
+    <div class="reveal" style="text-align:center; margin-bottom: 0;">
+      <div class="section-tag" style="justify-content:center;"><span style="display:none"></span>Kameralny Format</div>
+      <h2 class="section-h2" style="text-align:center;">Co Wyróżnia<br><em>Nasze Wydarzenie</em></h2>
+    </div>
+    <div class="format-grid">
+      <div class="format-card reveal d1">
+        <div class="format-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="20" stroke="#1a2340" stroke-width="2"/>
+            <path d="M24 14v10l7 4" stroke="#e8460a" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Ograniczona Liczba Miejsc</h3>
+        <p>Od początku zależy nam na ograniczonej liczbie uczestników i dobrej organizacji dnia. Żadnej anonimowości, żadnego chaosu.</p>
+      </div>
+      <div class="format-card reveal d2">
+        <div class="format-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="14" width="36" height="24" rx="2" stroke="#1a2340" stroke-width="2"/>
+            <path d="M6 22h36" stroke="#e8460a" stroke-width="2"/>
+            <path d="M16 10v8M32 10v8" stroke="#1a2340" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Zamknięty Event</h3>
+        <p>Pierwsza edycja ma charakter zamknięty — limited access. Grono uczestników jest starannie dobierane pod kątem poziomu i podejścia do jazdy.</p>
+      </div>
+      <div class="format-card reveal d3">
+        <div class="format-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24 8l4.5 9 10 1.5-7.2 7 1.7 10L24 31l-9 4.5 1.7-10L9.5 18.5l10-1.5L24 8z" stroke="#1a2340" stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="24" cy="24" r="3" fill="#e8460a"/>
+          </svg>
+        </div>
+        <h3>Merytoryczne Wsparcie</h3>
+        <p>Instruktor odpowiada za briefing oraz bieżące wsparcie uczestników, również przez radio. Nie jesteś sam na torze.</p>
+      </div>
+      <div class="format-card reveal d4">
+        <div class="format-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 34c4-8 12-12 16-12s12 4 16 12" stroke="#1a2340" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="24" cy="18" r="6" stroke="#e8460a" stroke-width="2"/>
+          </svg>
+        </div>
+        <h3>Dobre Towarzystwo</h3>
+        <p>Atmosfera naturalnie wynikająca ze wspólnej pasji. Spotykasz ludzi, którzy naprawdę cenią jazdę i motoryzację.</p>
+      </div>
+      <div class="format-card reveal d5">
+        <div class="format-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 30L20 20l8 8 10-14" stroke="#e8460a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="38" cy="14" r="3" fill="#1a2340"/>
+          </svg>
+        </div>
+        <h3>Skupienie na Rozwoju</h3>
+        <p>Nie chodzi tylko o przejechanie jak największej liczby okrążeń. Chodzi o świadome rozwijanie techniki i umiejętności.</p>
+      </div>
+      <div class="format-card reveal d6">
+        <div class="format-icon">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 36l8-20 6 14 4-8 6 14" stroke="#1a2340" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 36h32" stroke="#e8460a" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Własne Tempo</h3>
+        <p>Małe grupy na torze oznaczają, że każdy ma realną przestrzeń do jazdy i skupienia — bez presji z zewnątrz.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Price -->
+<section id="price">
+  <div class="price-bg-text">1200</div>
+  <div class="container">
+    <div class="price-inner">
+      <div class="reveal">
+        <div class="section-tag" style="justify-content:center;"><span style="display:none"></span>Pakiet Uczestnictwa</div>
+        <h2 class="section-h2" style="color:var(--white);">Cena<br><em>Pierwszej Edycji</em></h2>
+      </div>
+      <div class="price-card reveal d2" id="priceCard">
+        <div class="price-from">od</div>
+        <div class="price-num">
+          <span class="price-big" id="priceCounter">1200</span>
+          <span class="price-currency">PLN</span>
+        </div>
+        <div class="price-includes">
+          <div class="price-item">Udział w wydarzeniu i dostęp do części torowej</div>
+          <div class="price-item">Briefing i szkolenie przed jazdą</div>
+          <div class="price-item">Wsparcie instruktora w trakcie jazdy</div>
+          <div class="price-item">Jazda w małych grupach torowych</div>
+          <div class="price-item">Otwarta sesja torowa po szkoleniu</div>
+        </div>
+        <div class="price-note">
+          Ostateczne warunki udziału oraz sposób rozliczenia przekazujemy bezpośrednio zainteresowanym uczestnikom. Szczegółowy zakres pakietu będzie potwierdzany wraz z finalnym zamknięciem organizacji.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Atmosphere -->
+<section id="atmosphere">
+  <div class="container">
+    <div class="reveal" style="text-align:center; margin-bottom:0;">
+      <div class="section-tag" style="justify-content:center;">Atmosfera</div>
+      <h2 class="section-h2" style="text-align:center;">Kameralnie<br><em>i na poważnie</em></h2>
+    </div>
+    <div class="atmosphere-masonry reveal d2">
+      <div class="atm-img"><img src="assets/2.png" alt="Track"></div>
+      <div class="atm-img"><img src="assets/5.png" alt="Track"></div>
+      <div class="atm-img"><img src="assets/3.png" alt="Track"></div>
+      <div class="atm-img"><img src="assets/1.png" alt="Track"></div>
+      <div class="atm-img"><img src="assets/4.png" alt="Track"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Organizers -->
+<section id="organizers">
+  <div class="container">
+    <div class="org-inner">
+      <div class="org-text reveal">
+        <div class="section-tag">Organizatorzy</div>
+        <h2 class="section-h2" style="font-size:clamp(32px,3vw,48px);">Thoriana<br>& Classic Cars Warsaw</h2>
+        <p style="margin-top:16px;">Wydarzenie organizowane przez Thoriana we współpracy z Classic Cars Warsaw — łącząc pasję do motorsportu z doświadczeniem w organizacji eventów motoryzacyjnych.</p>
+      </div>
+      <div class="org-logos reveal d3">
+        <div class="org-logo">
+          <img src="assets/logo.png" alt="Thoriana Racing">
+          <span>Thoriana Racing</span>
+        </div>
+        <div class="org-separator"></div>
+        <div class="org-logo">
+          <img src="assets/icon.jpg" alt="Classic Cars Warsaw" style="border-radius:4px;">
+          <span>Classic Cars Warsaw</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section id="contact">
+  <div class="contact-bg-line" id="contactLine"></div>
+  <div class="container">
+    <div class="contact-inner">
+      <div class="reveal">
+        <div class="section-tag" style="justify-content:center;">Zgłoszenia</div>
+        <h2 class="section-h2">Chcesz<br><em>dołączyć?</em></h2>
+      </div>
+      <p class="contact-desc reveal d2">Pierwsza edycja realizowana jest w formule zamkniętej. Jeśli chcesz dołączyć lub uzyskać więcej informacji, skontaktuj się z nami bezpośrednio.</p>
+      <form class="contact-form reveal d3" onsubmit="handleSubmit(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Imię i Nazwisko</label>
+            <input type="text" placeholder="Jan Kowalski" required>
+          </div>
+          <div class="form-group">
+            <label>Adres Email</label>
+            <input type="email" placeholder="jan@example.com" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Telefon</label>
+            <input type="tel" placeholder="+48 000 000 000">
+          </div>
+          <div class="form-group">
+            <label>Poziom Doświadczenia</label>
+            <select>
+              <option value="">Wybierz...</option>
+              <option>Średniozaawansowany</option>
+              <option>Zaawansowany</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Samochód</label>
+          <input type="text" placeholder="Marka, model, rocznik">
+        </div>
+        <div class="form-group">
+          <label>Wiadomość (opcjonalnie)</label>
+          <textarea placeholder="Dodatkowe informacje, pytania..."></textarea>
+        </div>
+        <button type="submit" class="form-submit">
+          <span>Wyślij Zgłoszenie</span>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">
+    <img src="assets/logo.png" alt="Thoriana Racing">
+  </div>
+  <div class="footer-copy">© 2025 Thoriana Racing. Wszelkie prawa zastrzeżone.</div>
+  <ul class="footer-links">
+    <li><a href="#about">O Wydarzeniu</a></li>
+    <li><a href="#formula">Formuła</a></li>
+    <li><a href="#contact">Kontakt</a></li>
+  </ul>
+</footer>
+
+<script>
+// ─── CURSOR
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+});
+
+function animRing() {
+  rx += (mx - rx) * 0.10;
+  ry += (my - ry) * 0.10;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+
+document.querySelectorAll('a, button, .format-card, .whom-card').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursor.style.width = '16px'; cursor.style.height = '16px';
+    ring.style.width = '60px'; ring.style.height = '60px'; ring.style.opacity = '0.35';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursor.style.width = '10px'; cursor.style.height = '10px';
+    ring.style.width = '40px'; ring.style.height = '40px'; ring.style.opacity = '0.6';
+  });
+});
+
+// ─── PRELOADER
+const counterEl = document.getElementById('counter');
+let count = 0;
+const interval = setInterval(() => {
+  count += Math.floor(Math.random() * 7) + 2;
+  if (count >= 100) { count = 100; clearInterval(interval); }
+  counterEl.textContent = count + '%';
+}, 75);
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const pre = document.getElementById('preloader');
+    pre.classList.add('done');
+    setTimeout(() => {
+      pre.style.display = 'none';
+      document.getElementById('nav').classList.add('visible');
+      document.getElementById('heroTag').style.animation = 'fadeUp 0.8s 0.1s forwards';
+      document.getElementById('heroH1').style.animation = 'fadeUp 0.9s 0.3s forwards';
+      document.getElementById('heroSub').style.animation = 'fadeUp 0.8s 0.5s forwards';
+      document.getElementById('heroActions').style.animation = 'fadeUp 0.8s 0.7s forwards';
+    }, 1200);
+  }, 2600);
+});
+
+// ─── NAV scroll
+window.addEventListener('scroll', () => {
+  document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// ─── REVEAL on scroll
+const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.08, rootMargin: '0px 0px -50px 0px' });
+revealEls.forEach(el => observer.observe(el));
+
+// Contact line
+const lineEl = document.getElementById('contactLine');
+const lineObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) lineEl.classList.add('in'); });
+}, { threshold: 0.2 });
+lineObs.observe(lineEl);
+
+// ─── COUNT-UP ANIMATION on price
+function countUp(el, target, duration) {
+  let start = 0;
+  const step = target / (duration / 16);
+  const timer = setInterval(() => {
+    start += step;
+    if (start >= target) { start = target; clearInterval(timer); }
+    el.textContent = Math.floor(start);
+  }, 16);
+}
+
+const priceCard = document.getElementById('priceCard');
+const priceCounter = document.getElementById('priceCounter');
+let priceAnimated = false;
+const priceObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !priceAnimated) {
+      priceAnimated = true;
+      priceCard.classList.add('in');
+      setTimeout(() => countUp(priceCounter, 1200, 1400), 300);
+    }
+  });
+}, { threshold: 0.3 });
+if (priceCard) priceObs.observe(priceCard);
+
+// ─── MAGNETIC BUTTONS
+document.querySelectorAll('.btn-primary, .nav-cta, .form-submit').forEach(btn => {
+  btn.addEventListener('mousemove', e => {
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    btn.style.transform = `translate(${x * 0.18}px, ${y * 0.18}px)`;
+  });
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transform = '';
+    btn.style.transition = 'transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+    setTimeout(() => { btn.style.transition = ''; }, 500);
+  });
+});
+
+// ─── GLITCH on hero h1 (random subtle glitch)
+function glitchHero() {
+  const h1 = document.getElementById('heroH1');
+  if (!h1) return;
+  h1.style.animation = 'fadeUp 0s forwards'; // keep visible
+  h1.style.textShadow = `
+    ${(Math.random()-0.5)*6}px 0 #e8460a,
+    ${(Math.random()-0.5)*6}px 0 #1a2340
+  `;
+  setTimeout(() => { h1.style.textShadow = 'none'; }, 80);
+  setTimeout(() => {
+    h1.style.textShadow = `${(Math.random()-0.5)*3}px 0 rgba(232,70,10,0.5)`;
+    setTimeout(() => { h1.style.textShadow = 'none'; }, 60);
+  }, 120);
+}
+// Trigger glitch randomly every 4-8 seconds (only after preloader)
+setTimeout(() => {
+  setInterval(glitchHero, 4000 + Math.random() * 4000);
+}, 4000);
+
+// ─── SPEED LINES on price section hover
+const priceSection = document.getElementById('price');
+if (priceSection) {
+  const canvas = document.createElement('canvas');
+  canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0;transition:opacity 0.4s;';
+  priceSection.insertBefore(canvas, priceSection.firstChild);
+  const ctx = canvas.getContext('2d');
+  let lines = [], animating = false, raf;
+
+  function makeLines() {
+    lines = [];
+    for (let i = 0; i < 40; i++) {
+      lines.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        len: Math.random() * 300 + 80,
+        speed: Math.random() * 12 + 6,
+        alpha: Math.random() * 0.12 + 0.03,
+        w: Math.random() * 1 + 0.3
+      });
+    }
+  }
+
+  function drawLines() {
+    canvas.width = priceSection.offsetWidth;
+    canvas.height = priceSection.offsetHeight;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    lines.forEach(l => {
+      ctx.save();
+      ctx.strokeStyle = `rgba(232,70,10,${l.alpha})`;
+      ctx.lineWidth = l.w;
+      ctx.beginPath();
+      ctx.moveTo(l.x, l.y);
+      ctx.lineTo(l.x + l.len, l.y);
+      ctx.stroke();
+      ctx.restore();
+      l.x += l.speed;
+      if (l.x > canvas.width + l.len) l.x = -l.len - 50;
+    });
+    if (animating) raf = requestAnimationFrame(drawLines);
+  }
+
+  priceSection.addEventListener('mouseenter', () => {
+    canvas.style.opacity = '1';
+    animating = true;
+    makeLines();
+    drawLines();
+  });
+  priceSection.addEventListener('mouseleave', () => {
+    canvas.style.opacity = '0';
+    animating = false;
+    cancelAnimationFrame(raf);
+  });
+}
+
+// ─── HORIZONTAL SECTION NUMBER ticker (section counter in nav area)
+let currentSection = '';
+const sections = document.querySelectorAll('section[id]');
+const sectionObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) currentSection = e.target.id;
+  });
+}, { threshold: 0.4 });
+sections.forEach(s => sectionObs.observe(s));
+
+// ─── TILT on whom-cards
+document.querySelectorAll('.whom-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    card.style.transform = `perspective(600px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) translateZ(10px)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+    card.style.transition = 'transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+    setTimeout(() => card.style.transition = '', 500);
+  });
+});
+
+// ─── PARALLAX hero bg
+window.addEventListener('scroll', () => {
+  const hero = document.querySelector('.hero-bg img');
+  if (hero) {
+    hero.style.transform = `scale(1) translateY(${window.scrollY * 0.22}px)`;
+  }
+  // Subtle parallax on about image
+  const aboutImg = document.querySelector('.about-img-wrap img');
+  if (aboutImg) {
+    const rect = aboutImg.closest('section').getBoundingClientRect();
+    const offset = -rect.top * 0.06;
+    aboutImg.style.transform = `translateY(${offset}px)`;
+  }
+});
+
+// ─── FORM
+function handleSubmit(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('.form-submit');
+  const span = btn.querySelector('span');
+  btn.style.background = '#1a2340';
+  span.textContent = 'Wysłano ✓';
+  btn.style.transform = 'scale(0.98)';
+  setTimeout(() => { span.textContent = 'Wyślij Zgłoszenie'; btn.style.transform = ''; }, 3000);
+}
+
+// ─── STAGGER timeline items on scroll
+document.querySelectorAll('.timeline-item').forEach((item, i) => {
+  item.style.transitionDelay = `${i * 0.12}s`;
+});
+
+const timelineObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('tl-in');
+  });
+}, { threshold: 0.2 });
+document.querySelectorAll('.timeline-item').forEach(el => timelineObs.observe(el));
+</script>
+</body>
+</html>
