@@ -609,6 +609,20 @@
     margin-top: 24px;
   }
 
+  .for-whom-badge {
+    margin-top: 32px;
+    border-left: 3px solid var(--orange);
+    padding: 16px 20px;
+    background: rgba(232,70,10,0.08);
+  }
+  .for-whom-badge span {
+    font-size: 13px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.65);
+    font-style: italic;
+    display: block;
+  }
+
   .whom-cards {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1023,6 +1037,56 @@
     color: rgba(255,255,255,0.3);
     font-style: italic;
     line-height: 1.6;
+    max-width: 440px;
+    text-align: center;
+  }
+
+  /* ─── CO-DRIVER BLOCK ─── */
+  .price-codriver {
+    width: 100%;
+    margin-top: 32px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .price-codriver-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .price-codriver-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--white);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-style: italic;
+  }
+  .price-codriver-value span {
+    font-size: 18px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.08em;
+    font-style: normal;
+    margin-left: 6px;
+  }
+  .price-codriver-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,0.4);
+    line-height: 1.65;
+    max-width: 400px;
+  }
+  @media (max-width: 900px) {
+    .price-codriver-value { font-size: 36px; }
   }
 
   /* ─── ATMOSPHERE ─── */
@@ -1518,7 +1582,7 @@
       <em>Racing</em><br>
       TrackDay
     </h1>
-    <p class="hero-sub" id="heroSub">Driving with friends — kameralny track day dla kierowców, którzy chcą jeździć sprawniej, pewniej i w dobrym towarzystwie.</p>
+    <p class="hero-sub" id="heroSub">Kameralny track day dla kierowców, którzy chcą jeździć sprawniej i pewniej — w dobrym towarzystwie.</p>
     <div class="hero-actions" id="heroActions">
       <a href="#contact" class="btn-primary"><span>Zgłoś się</span></a>
       <a href="#about" class="btn-ghost">
@@ -1611,7 +1675,7 @@
         <div class="section-tag">Dla Kogo</div>
         <h2 class="section-h2">Jazda<br>dla tych,<br>którzy<br><em>chcą więcej</em></h2>
         <p>Format dla osób, które już jeżdżą i chcą robić to lepiej. Świadoma technika, dobre towarzystwo, realne tempo — niezależnie od punktu wyjścia.</p>
-        <div class="for-whom-badge reveal d2">
+        <div class="for-whom-badge">
           <span>Wydarzenie łączy wszystkich, którym zależy na tym samym — jeździć lepiej, świadomiej i w dobrym gronie.</span>
         </div>
       </div>
@@ -1706,11 +1770,11 @@
         <h2 class="section-h2">Twoje<br>auto,<br><em>twój tor</em></h2>
 
         <div class="cars-highlight">
-          <p>Formuła stworzona z myślą o osobach, które chcą lepiej poznać możliwości swojego auta.</p>
+          <p>To event dla samochodów cywilnych — możesz przyjechać tym, którym jeździsz na co dzień.</p>
         </div>
 
-        <p>Uczestnicy biorą udział w wydarzeniu przede wszystkim własnymi samochodami. To najlepszy sposób, żeby pewniej wykorzystywać auto w warunkach torowych i naprawdę zrozumieć jego granice.</p>
-        <p>Jazda własnym samochodem na torze to doświadczenie, które przekłada się bezpośrednio na codzienną jazdę i świadomość kierowcy.</p>
+        <p>Nie potrzebujesz auta przygotowanego torowo. Udział własnymi samochodami to sedno tej formuły — chodzi o to, żeby lepiej poznać możliwości swojego auta i pewniej wykorzystywać je w warunkach torowych.</p>
+        <p>Jazda własnym samochodem na torze to doświadczenie, które bezpośrednio przekłada się na świadomość i pewność za kierownicą na co dzień.</p>
       </div>
     </div>
   </div>
@@ -1804,13 +1868,25 @@
           <span class="price-big">1200</span>
           <span class="price-currency">PLN</span>
         </div>
+
         <div class="price-includes">
           <div class="price-item">Udział w wydarzeniu i dostęp do części torowej</div>
           <div class="price-item">Briefing i szkolenie przed jazdą</div>
-          <div class="price-item">Wsparcie instruktora w trakcie jazdy</div>
-          <div class="price-item">Jazda w małych grupach torowych</div>
+          <div class="price-item">Wsparcie instruktora i komunikacja radiowa w trakcie jazdy</div>
+          <div class="price-item">Jazda w kilkuosobowych grupach torowych</div>
           <div class="price-item">Otwarta sesja torowa po szkoleniu</div>
+          <div class="price-item">Wymiana wrażeń w czasie wspólnego posiłku</div>
         </div>
+
+        <div class="price-codriver reveal d3">
+          <div class="price-codriver-label">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#e8460a" stroke-width="1.5"/><path d="M7 4v3l2 1.5" stroke="#e8460a" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Ko-kierowca / dodatkowy uczestnik
+          </div>
+          <div class="price-codriver-value">+200 <span>PLN / os.</span></div>
+          <p class="price-codriver-desc">Jeśli jadą jednym autem dwaj uczestnicy, cena bazowa pozostaje bez zmian — doliczana jest wyłącznie dodatkowa opłata za każdą kolejną osobę.</p>
+        </div>
+
         <div class="price-note">
           Ostateczne warunki udziału oraz sposób rozliczenia przekazujemy bezpośrednio zainteresowanym uczestnikom. Szczegółowy zakres pakietu będzie potwierdzany wraz z finalnym zamknięciem organizacji.
         </div>
