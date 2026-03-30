@@ -195,6 +195,7 @@
   .nav-links a:hover { color: var(--orange); }
   .nav-links a:hover::after { width: 100%; }
   nav.scrolled .nav-links a:hover { color: var(--orange); }
+  nav.scrolled .nav-links a:hover { color: var(--orange); }
 
   .nav-cta {
     font-family: 'Barlow Condensed', sans-serif;
@@ -1037,8 +1038,6 @@
     color: rgba(255,255,255,0.3);
     font-style: italic;
     line-height: 1.6;
-    max-width: 440px;
-    text-align: center;
   }
 
   /* ─── CO-DRIVER BLOCK ─── */
@@ -1085,8 +1084,14 @@
     line-height: 1.65;
     max-width: 400px;
   }
-  @media (max-width: 900px) {
-    .price-codriver-value { font-size: 36px; }
+  .price-note {
+    margin-top: 40px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.3);
+    font-style: italic;
+    line-height: 1.6;
+    max-width: 440px;
+    text-align: center;
   }
 
   /* ─── ATMOSPHERE ─── */
@@ -1095,25 +1100,43 @@
     background: var(--off-white);
   }
 
-  .atmosphere-masonry {
-    columns: 3;
-    column-gap: 8px;
+    /* ─── ATMOSPHERE GRID ─── */
+  .atmosphere-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr;
+    grid-template-rows: 280px 280px;
+    gap: 8px;
     margin-top: 64px;
   }
   .atm-img {
-    break-inside: avoid;
-    margin-bottom: 8px;
     overflow: hidden;
+    position: relative;
   }
   .atm-img img {
-    width: 100%;
+    width: 100%; height: 100%;
+    object-fit: cover;
     display: block;
-    filter: brightness(0.88) saturate(0.7);
+    filter: brightness(0.85) saturate(0.75);
     transition: filter 0.5s, transform 0.6s cubic-bezier(0.4,0,0.2,1);
   }
   .atm-img:hover img {
     filter: brightness(1) saturate(1);
     transform: scale(1.04);
+  }
+  .atm-img.tall { grid-row: span 2; }
+  @media (max-width: 900px) {
+    .atmosphere-grid {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 200px 200px 200px;
+    }
+    .atm-img.tall { grid-row: span 1; }
+  }
+  @media (max-width: 480px) {
+    .atmosphere-grid {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto;
+    }
+    .atm-img { height: 220px; }
   }
 
   /* ─── ORGANIZERS ─── */
@@ -1659,9 +1682,9 @@
         </div>
       </div>
       <div class="about-img-wrap reveal-right d3">
-        <img src="assets/2.png" alt="Track Day">
+        <img src="assets/1.png" alt="Track Day">
         <div class="about-img-accent"></div>
-        <div class="about-img-tag">TrackDay 2025</div>
+        <div class="about-img-tag">TrackDay</div>
       </div>
     </div>
   </div>
@@ -1750,9 +1773,9 @@
     </div>
 
     <div class="formula-img-grid reveal d2">
-      <div class="big-img"><img src="assets/3.png" alt="Track"></div>
-      <div><img src="assets/4.png" alt="Track"></div>
-      <div><img src="assets/5.png" alt="Track"></div>
+      <div class="big-img"><img src="assets/5.png" alt="Track"></div>
+      <div><img src="assets/zdj_1.jpg" alt="Track"></div>
+      <div><img src="assets/zdj_2.jpg" alt="Track"></div>
     </div>
   </div>
 </section>
@@ -1868,7 +1891,6 @@
           <span class="price-big">1200</span>
           <span class="price-currency">PLN</span>
         </div>
-
         <div class="price-includes">
           <div class="price-item">Udział w wydarzeniu i dostęp do części torowej</div>
           <div class="price-item">Briefing i szkolenie przed jazdą</div>
@@ -1878,7 +1900,7 @@
           <div class="price-item">Wymiana wrażeń w czasie wspólnego posiłku</div>
         </div>
 
-        <div class="price-codriver reveal d3">
+        <div class="price-codriver">
           <div class="price-codriver-label">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#e8460a" stroke-width="1.5"/><path d="M7 4v3l2 1.5" stroke="#e8460a" stroke-width="1.5" stroke-linecap="round"/></svg>
             Ko-kierowca / dodatkowy uczestnik
@@ -1902,12 +1924,12 @@
       <div class="section-tag" style="justify-content:center;">Atmosfera</div>
       <h2 class="section-h2" style="text-align:center;">Kameralnie<br><em>i na poważnie</em></h2>
     </div>
-    <div class="atmosphere-masonry reveal d2">
-      <div class="atm-img"><img src="assets/2.png" alt="Track"></div>
-      <div class="atm-img"><img src="assets/5.png" alt="Track"></div>
-      <div class="atm-img"><img src="assets/3.png" alt="Track"></div>
-      <div class="atm-img"><img src="assets/1.png" alt="Track"></div>
-      <div class="atm-img"><img src="assets/4.png" alt="Track"></div>
+    <div class="atmosphere-grid reveal d2">
+      <div class="atm-img tall"><img src="assets/cc_1.jpg" alt="Classic Cars Warsaw"></div>
+      <div class="atm-img"><img src="assets/cc_2.webp" alt="Track"></div>
+      <div class="atm-img"><img src="assets/zdj_1.jpg" alt="Track"></div>
+      <div class="atm-img"><img src="assets/cc_3.webp" alt="Track"></div>
+      <div class="atm-img"><img src="assets/zdj_3.jpg" alt="Track"></div>
     </div>
   </div>
 </section>
