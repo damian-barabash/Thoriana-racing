@@ -1968,25 +1968,25 @@
         <h2 class="section-h2">Chcesz<br><em>dołączyć?</em></h2>
       </div>
       <p class="contact-desc reveal d2">Pierwsza edycja realizowana jest w formule zamkniętej. Jeśli chcesz dołączyć lub uzyskać więcej informacji, skontaktuj się z nami bezpośrednio.</p>
-      <form class="contact-form reveal d3" onsubmit="handleSubmit(event)">
+      <form class="contact-form reveal d3" id="contactForm" onsubmit="handleSubmit(event)">
         <div class="form-row">
           <div class="form-group">
             <label>Imię i Nazwisko</label>
-            <input type="text" placeholder="Jan Kowalski" required>
+            <input type="text" name="name" placeholder="Jan Kowalski" required>
           </div>
           <div class="form-group">
             <label>Adres Email</label>
-            <input type="email" placeholder="jan@example.com" required>
+            <input type="email" name="email" placeholder="jan@example.com" required>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
             <label>Telefon</label>
-            <input type="tel" placeholder="+48 000 000 000">
+            <input type="tel" name="phone" placeholder="+48 000 000 000">
           </div>
           <div class="form-group">
             <label>Poziom Doświadczenia</label>
-            <select>
+            <select name="level">
               <option value="">Wybierz...</option>
               <option>Średniozaawansowany</option>
               <option>Zaawansowany</option>
@@ -1995,14 +1995,14 @@
         </div>
         <div class="form-group">
           <label>Samochód</label>
-          <input type="text" placeholder="Marka, model, rocznik">
+          <input type="text" name="car" placeholder="Marka, model, rocznik">
         </div>
         <div class="form-group">
           <label>Wiadomość (opcjonalnie)</label>
-          <textarea placeholder="Dodatkowe informacje, pytania..."></textarea>
+          <textarea name="message" placeholder="Dodatkowe informacje, pytania..."></textarea>
         </div>
-        <button type="submit" class="form-submit">
-          <span>Wyślij Zgłoszenie</span>
+        <button type="submit" class="form-submit" id="formBtn">
+          <span id="formBtnText">Wyślij Zgłoszenie</span>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M4 10h12M10 4l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
@@ -2283,15 +2283,63 @@ if (!isMobile) {
   }, { passive: true });
 }
 
-// ─── FORM
-function handleSubmit(e) {
+// ─── FORM → Cloudflare Worker
+// ↓ Замени на URL своего Worker после деплоя
+const WORKER_URL = "https://thoriana.dmytrii-spectrum.workers.dev";
+
+async function handleSubmit(e) {
   e.preventDefault();
-  const btn = e.target.querySelector('.form-submit');
-  const span = btn.querySelector('span');
-  btn.style.background = '#1a2340';
-  span.textContent = 'Wysłano ✓';
-  btn.style.transform = 'scale(0.98)';
-  setTimeout(() => { span.textContent = 'Wyślij Zgłoszenie'; btn.style.transform = ''; }, 3000);
+  const form   = e.target;
+  const btn    = document.getElementById('formBtn');
+  const btnTxt = document.getElementById('formBtnText');
+
+  // Collect data
+  const data = {
+    name:    form.querySelector('[name="name"]').value.trim(),
+    email:   form.querySelector('[name="email"]').value.trim(),
+    phone:   form.querySelector('[name="phone"]').value.trim(),
+    level:   form.querySelector('[name="level"]').value,
+    car:     form.querySelector('[name="car"]').value.trim(),
+    message: form.querySelector('[name="message"]').value.trim(),
+  };
+
+  // Loading state
+  btn.disabled = true;
+  btn.style.opacity = '0.7';
+  btnTxt.textContent = 'Wysyłanie...';
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (res.ok) {
+      // Success
+      btn.style.background = '#1a2340';
+      btn.style.opacity = '1';
+      btnTxt.textContent = 'Wysłano ✓';
+      form.reset();
+      setTimeout(() => {
+        btnTxt.textContent = 'Wyślij Zgłoszenie';
+        btn.disabled = false;
+        btn.style.background = '';
+      }, 4000);
+    } else {
+      throw new Error(`Status ${res.status}`);
+    }
+  } catch (err) {
+    console.error('Form error:', err);
+    btn.style.background = '#c0392b';
+    btn.style.opacity = '1';
+    btnTxt.textContent = 'Błąd — spróbuj ponownie';
+    btn.disabled = false;
+    setTimeout(() => {
+      btnTxt.textContent = 'Wyślij Zgłoszenie';
+      btn.style.background = '';
+    }, 4000);
+  }
 }
 
 // ─── STAGGER timeline items on scroll
